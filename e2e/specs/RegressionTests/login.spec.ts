@@ -1,7 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { test } from '../../base/fixtures';
 
-const suiteName = 'smoke';
+const suiteName = '@regression';
 
 test.setTimeout(1200000);
 
