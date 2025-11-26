@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: write # Needed for GitHub Pages deployment
+  pages: write
+  id-token: write
+
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
@@ -27,18 +31,17 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test --reporter=html
 
-      # Upload Playwright Report
-      - name: Upload Playwright Report Artifact
-        id: upload-report
-        uses: actions/upload-artifact@v4
+      # --- Upload to GitHub Pages ---
+      - name: Upload Report to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: playwright-report
           path: playwright-report/
-          retention-days: 30
 
-      # 👉 Output a direct LINK to the test results
-      - name: Output Test Result URL
-        run: |
-          echo "TEST_RESULT_URL=${{ steps.upload-report.outputs.artifact-url }}/index.html" >> $GITHUB_OUTPUT
-          echo ""
-          echo "🔗 Playwright Report: ${{ steps.upload-report.outputs.artifact-url }}/index.html"
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
